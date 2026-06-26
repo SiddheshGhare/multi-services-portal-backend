@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter
             return chain.filter(exchange);
         }
         
+        
 
         String authHeader =
                 exchange.getRequest()

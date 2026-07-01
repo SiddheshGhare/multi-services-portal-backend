@@ -8,4 +8,6 @@ import java.util.List;
 public interface ProviderSkillRepository extends JpaRepository<ProviderSkill, Long> {
 
     List<ProviderSkill> findByProviderId(Long providerId);
+
+    List<ProviderSkill> findByCategory_Id(Long categoryId);
 }

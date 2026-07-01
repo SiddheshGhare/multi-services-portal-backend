@@ -4,20 +4,35 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "provider_skill")
+@Table(
+        name = "provider_skill",
+        indexes = {
+                @Index(name = "idx_provider_skill", columnList = "provider_id"),
+                @Index(name = "idx_service_category", columnList = "service_category_id")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProviderSkill {
+@Builder
+public class ProviderSkill extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long providerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provider_id", nullable = false)
+    private ProviderProfile provider;
 
-    private Long serviceCategoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_category_id", nullable = false)
+    private ServiceCategory category;
 
+    @Column(nullable = false)
     private Double basePrice;
+
+    @Column(nullable = false)
+    private Boolean active = true;
 }

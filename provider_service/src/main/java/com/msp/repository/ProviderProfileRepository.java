@@ -16,4 +16,5 @@ public interface ProviderProfileRepository extends JpaRepository<ProviderProfile
     boolean existsByAuthUserId(Long authUserId);
 
     List<ProviderProfile> findByApprovalStatus(ApprovalStatus status);
+    
 }

@@ -1,5 +1,6 @@
 package com.msp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.msp.enums.DocumentType;
 import com.msp.enums.VerificationStatus;
 import jakarta.persistence.*;
@@ -25,6 +26,7 @@ public class ProviderDocument extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id", nullable = false)
+    @JsonIgnore
     private ProviderProfile provider;
 
     @Enumerated(EnumType.STRING)

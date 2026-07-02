@@ -1,8 +1,11 @@
 package com.msp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.*;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(
         name = "provider_skill",
@@ -24,6 +27,7 @@ public class ProviderSkill extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id", nullable = false)
+    @JsonIgnore
     private ProviderProfile provider;
 
     @ManyToOne(fetch = FetchType.LAZY)

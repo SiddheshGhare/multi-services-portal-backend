@@ -13,10 +13,10 @@
     </parent>
 
     <groupId>com.msp</groupId>
-    <artifactId>provider_service</artifactId>
+    <artifactId>booking_service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>provider_service</name>
-    <description>Provider Service for MSP</description>
+    <name>booking_service</name>
+    <description>Booking Service for MSP</description>
 
     <properties>
         <java.version>21</java.version>
@@ -61,18 +61,17 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
+        <!-- OpenFeign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- Cloudinary -->
-        <dependency>
-            <groupId>com.cloudinary</groupId>
-            <artifactId>cloudinary-http44</artifactId>
-            <version>1.38.0</version>
         </dependency>
 
         <!-- Lombok -->

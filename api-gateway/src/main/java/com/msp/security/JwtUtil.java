@@ -1,7 +1,5 @@
 package com.msp.security;
 
-
-
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -22,7 +20,10 @@ public class JwtUtil {
 
     private final SecretKey key =
             Keys.hmacShaKeyFor(
-                    SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+                    SECRET_KEY.getBytes(
+                            StandardCharsets.UTF_8
+                    )
+            );
 
     private Claims extractAllClaims(String token) {
 
@@ -39,14 +40,16 @@ public class JwtUtil {
 
             Claims claims = extractAllClaims(token);
 
-            return !claims.getExpiration()
-                    .before(new Date());
+            Date expiration = claims.getExpiration();
 
-        } catch (ExpiredJwtException e) {
+            return expiration != null
+                    && expiration.after(new Date());
+
+        } catch (ExpiredJwtException exception) {
 
             return false;
 
-        } catch (Exception e) {
+        } catch (Exception exception) {
 
             return false;
         }
@@ -66,9 +69,15 @@ public class JwtUtil {
 
     public Long extractUserId(String token) {
 
-        Integer id = extractAllClaims(token)
-                .get("userId", Integer.class);
+        Number userId = extractAllClaims(token)
+                .get("userId", Number.class);
 
-        return id.longValue();
+        if (userId == null) {
+            throw new IllegalArgumentException(
+                    "User ID is missing from token"
+            );
+        }
+
+        return userId.longValue();
     }
 }

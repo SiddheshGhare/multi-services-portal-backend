@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; color: #222;">
+<p>Hello,</p>
+<p>You have a new MSP notification.</p>
+<p><strong th:text="${subject}">Notification</strong></p>
+<p th:if="${message != null}" th:text="${message}">Please review your account for details.</p>
+<p>Regards,<br/>MSP Team</p>
+</body>
+</html>

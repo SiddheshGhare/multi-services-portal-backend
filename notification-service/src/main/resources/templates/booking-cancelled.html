@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; color: #222;">
+<p>Hello,</p>
+<p>A booking has been cancelled.</p>
+<p>
+    Booking: <strong th:text="${bookingNumber}">BK-12345678</strong><br/>
+    Service: <span th:text="${categoryName}">Service</span><br/>
+    Reason: <span th:text="${cancellationReason}">Cancelled</span>
+</p>
+<p th:if="${cancellationRemarks != null}" th:text="${cancellationRemarks}">Remarks</p>
+<p>Regards,<br/>MSP Team</p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; color: #222;">
+<p>Hello <span th:text="${providerName}">Provider</span>,</p>
+<p>You have received a new booking request.</p>
+<p>
+    Booking: <strong th:text="${bookingNumber}">BK-12345678</strong><br/>
+    Service: <span th:text="${categoryName}">Service</span><br/>
+    City: <span th:text="${city}">City</span><br/>
+    Schedule: <span th:text="${scheduledDate}">Date</span> at <span th:text="${scheduledTime}">Time</span>
+</p>
+<p>Please review the request in MSP.</p>
+<p>Regards,<br/>MSP Team</p>
+</body>
+</html>

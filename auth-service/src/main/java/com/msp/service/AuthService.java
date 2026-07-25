@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.msp.dto.AuthResponse;
+import com.msp.dto.AuthUserSummaryResponse;
 import com.msp.dto.LoginRequest;
 import com.msp.dto.LoginResult;
 import com.msp.dto.RegisterRequest;
@@ -15,6 +16,7 @@ import com.msp.entity.RefreshToken;
 import com.msp.entity.UserEntity;
 import com.msp.exception.InvalidCredentialsException;
 import com.msp.exception.UserAlreadyExistsException;
+import com.msp.exception.UserNotFoundException;
 import com.msp.repository.RefreshTokenRepository;
 import com.msp.repository.UserRepository;
 import com.msp.security.JwtUtil;
@@ -305,6 +307,17 @@ public class AuthService {
 
         refreshTokenRepository.delete(token);
 
+    }
+
+    public AuthUserSummaryResponse getUserSummaryById(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return new AuthUserSummaryResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
 
 }

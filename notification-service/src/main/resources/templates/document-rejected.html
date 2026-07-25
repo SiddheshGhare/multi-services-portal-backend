@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; color: #222;">
+<p>Hello <span th:text="${providerName}">Provider</span>,</p>
+<p>Your document <strong th:text="${documentType}">DOCUMENT</strong> was rejected during verification.</p>
+<p th:if="${remarks != null and !#strings.isEmpty(remarks)}">
+    Reason: <span th:text="${remarks}">Please resubmit a clearer copy.</span>
+</p>
+<p>Please update and resubmit the document so we can continue your onboarding.</p>
+<p>Regards,<br/>MSP Team</p>
+</body>
+</html>

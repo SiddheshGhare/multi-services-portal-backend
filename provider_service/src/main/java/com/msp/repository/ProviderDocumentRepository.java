@@ -3,12 +3,16 @@ package com.msp.repository;
 import com.msp.entity.ProviderDocument;
 import com.msp.enums.DocumentType;
 import com.msp.enums.VerificationStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProviderDocumentRepository extends JpaRepository<ProviderDocument, Long> {
+
+    @EntityGraph(attributePaths = "provider")
+    Optional<ProviderDocument> findDetailedById(Long id);
 
     List<ProviderDocument> findByProviderId(Long providerId);
 

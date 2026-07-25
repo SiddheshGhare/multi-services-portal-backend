@@ -15,6 +15,7 @@ import com.msp.exception.BadRequestException;
 import com.msp.exception.ResourceNotFoundException;
 import com.msp.feign.ProviderClient;
 import com.msp.repository.BookingRepository;
+import com.msp.service.BookingNotificationDispatcher;
 import com.msp.service.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final ProviderClient providerClient;
+    private final BookingNotificationDispatcher bookingNotificationDispatcher;
 
     @Override
     public BookingResponse createBooking(
@@ -71,6 +73,7 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
         Booking savedBooking = bookingRepository.save(booking);
+        bookingNotificationDispatcher.sendBookingCreated(savedBooking, providerInfo);
 
         return mapToResponse(savedBooking);
     }
@@ -146,6 +149,7 @@ public class BookingServiceImpl implements BookingService {
         );
 
         Booking updatedBooking = bookingRepository.save(booking);
+        bookingNotificationDispatcher.sendBookingCancelled(updatedBooking);
 
         return mapToResponse(updatedBooking);
     }

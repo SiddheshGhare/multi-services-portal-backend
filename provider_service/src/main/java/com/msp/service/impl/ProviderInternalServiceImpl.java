@@ -66,6 +66,7 @@ public class ProviderInternalServiceImpl
 
         return ProviderBookingInfoResponse.builder()
                 .providerId(provider.getId())
+                .providerAuthUserId(provider.getAuthUserId())
                 .providerName(provider.getFullName())
 
                 .providerApproved(

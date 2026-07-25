@@ -5,6 +5,7 @@ import com.msp.entity.ProviderDocument;
 import com.msp.enums.VerificationStatus;
 import com.msp.repository.ProviderDocumentRepository;
 import com.msp.service.AdminProviderDocumentService;
+import com.msp.service.ProviderNotificationDispatcher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class AdminProviderDocumentServiceImpl implements AdminProviderDocumentService {
 
     private final ProviderDocumentRepository providerDocumentRepository;
+    private final ProviderNotificationDispatcher providerNotificationDispatcher;
 
     @Override
     public List<ProviderDocument> getDocumentsByStatus(VerificationStatus status) {
@@ -24,7 +26,7 @@ public class AdminProviderDocumentServiceImpl implements AdminProviderDocumentSe
     @Override
     public ProviderDocument getDocumentById(Long documentId) {
 
-        return providerDocumentRepository.findById(documentId)
+        return providerDocumentRepository.findDetailedById(documentId)
                 .orElseThrow(() -> new RuntimeException("Document not found"));
     }
 
@@ -40,7 +42,9 @@ public class AdminProviderDocumentServiceImpl implements AdminProviderDocumentSe
         document.setVerificationStatus(VerificationStatus.VERIFIED);
         document.setRemarks(null);
 
-        return providerDocumentRepository.save(document);
+        ProviderDocument savedDocument = providerDocumentRepository.save(document);
+        providerNotificationDispatcher.sendDocumentApproved(savedDocument);
+        return savedDocument;
     }
 
     @Override
@@ -56,6 +60,8 @@ public class AdminProviderDocumentServiceImpl implements AdminProviderDocumentSe
         document.setVerificationStatus(VerificationStatus.REJECTED);
         document.setRemarks(request.getRemarks());
 
-        return providerDocumentRepository.save(document);
+        ProviderDocument savedDocument = providerDocumentRepository.save(document);
+        providerNotificationDispatcher.sendDocumentRejected(savedDocument);
+        return savedDocument;
     }
 }

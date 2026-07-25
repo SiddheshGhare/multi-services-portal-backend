@@ -11,6 +11,8 @@ public class ProviderBookingInfoResponse {
 
     private Long providerId;
 
+    private Long providerAuthUserId;
+
     private Long categoryId;
 
     private String providerName;

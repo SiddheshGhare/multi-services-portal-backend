@@ -6,6 +6,7 @@ import com.msp.enums.VerificationStatus;
 import com.msp.repository.ProviderDocumentRepository;
 import com.msp.repository.ProviderProfileRepository;
 import com.msp.service.AdminProviderService;
+import com.msp.service.ProviderNotificationDispatcher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class AdminProviderServiceImpl implements AdminProviderService {
 
     private final ProviderProfileRepository providerProfileRepository;
     private final ProviderDocumentRepository providerDocumentRepository;
+    private final ProviderNotificationDispatcher providerNotificationDispatcher;
 
     @Override
     public List<ProviderProfile> getProvidersByStatus(ApprovalStatus status) {
@@ -50,7 +52,9 @@ public class AdminProviderServiceImpl implements AdminProviderService {
 
         provider.setApprovalStatus(ApprovalStatus.APPROVED);
 
-        return providerProfileRepository.save(provider);
+        ProviderProfile savedProvider = providerProfileRepository.save(provider);
+        providerNotificationDispatcher.sendProviderApproved(savedProvider);
+        return savedProvider;
     }
 
     @Override
@@ -64,6 +68,8 @@ public class AdminProviderServiceImpl implements AdminProviderService {
 
         provider.setApprovalStatus(ApprovalStatus.REJECTED);
 
-        return providerProfileRepository.save(provider);
+        ProviderProfile savedProvider = providerProfileRepository.save(provider);
+        providerNotificationDispatcher.sendProviderRejected(savedProvider);
+        return savedProvider;
     }
 }

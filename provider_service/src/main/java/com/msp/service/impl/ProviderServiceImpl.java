@@ -5,97 +5,157 @@ import com.msp.dto.request.UpdateProviderProfileRequest;
 import com.msp.dto.response.ProviderProfileResponse;
 import com.msp.entity.ProviderProfile;
 import com.msp.enums.ApprovalStatus;
+import com.msp.exception.BadRequestException;
+import com.msp.exception.ResourceNotFoundException;
 import com.msp.repository.ProviderProfileRepository;
+import com.msp.service.CloudinaryService;
 import com.msp.service.ProviderService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProviderServiceImpl implements ProviderService {
 
-    private final ProviderProfileRepository repository;
+    private final ProviderProfileRepository providerProfileRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Override
-    public ProviderProfileResponse createProfile(Long authUserId, CreateProviderProfileRequest request) {
+    public ProviderProfileResponse createProfile(
+            Long authUserId,
+            CreateProviderProfileRequest request,
+            MultipartFile profileImage) {
 
-        if (repository.existsByAuthUserId(authUserId)) {
-            throw new RuntimeException("Provider profile already exists");
+        if (providerProfileRepository.existsByAuthUserId(authUserId)) {
+            throw new BadRequestException(
+                    "Provider profile already exists"
+            );
         }
 
-        ProviderProfile profile = ProviderProfile.builder()
-                .authUserId(authUserId)
-                .fullName(request.getFullName())
-                .phone(request.getPhone())
-                .profileImage(request.getProfileImage())
-                .description(request.getDescription())
-                .experienceYears(request.getExperienceYears())
-                .approvalStatus(ApprovalStatus.PENDING)
-                .averageRating(0.0)
-                .totalJobsCompleted(0)
-                .build();
+        String profileImageUrl = null;
 
-        repository.save(profile);
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl =
+                    cloudinaryService.uploadFile(profileImage);
+        }
 
-        return mapToResponse(profile);
+        ProviderProfile provider = new ProviderProfile();
+
+        provider.setAuthUserId(authUserId);
+        provider.setFullName(request.getFullName());
+        provider.setPhone(request.getPhone());
+        provider.setDescription(request.getDescription());
+        provider.setExperienceYears(
+                request.getExperienceYears()
+        );
+        provider.setProfileImage(profileImageUrl);
+        provider.setApprovalStatus(ApprovalStatus.PENDING);
+        provider.setAverageRating(0.0);
+        provider.setTotalJobsCompleted(0);
+
+        ProviderProfile savedProvider =
+                providerProfileRepository.save(provider);
+
+        return mapToResponse(savedProvider);
     }
 
     @Override
-    public ProviderProfileResponse getMyProfile(Long authUserId) {
+    @Transactional(readOnly = true)
+    public ProviderProfileResponse getMyProfile(
+            Long authUserId) {
 
-        ProviderProfile profile = repository.findByAuthUserId(authUserId)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        ProviderProfile provider =
+                findByAuthUserId(authUserId);
 
-        return mapToResponse(profile);
+        return mapToResponse(provider);
     }
 
     @Override
-    public ProviderProfileResponse updateProfile(Long authUserId, UpdateProviderProfileRequest request) {
+    public ProviderProfileResponse updateProfile(
+            Long authUserId,
+            UpdateProviderProfileRequest request,
+            MultipartFile profileImage) {
 
-        ProviderProfile profile = repository.findByAuthUserId(authUserId)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        ProviderProfile provider =
+                findByAuthUserId(authUserId);
 
-        if (request.getFullName() != null)
-            profile.setFullName(request.getFullName());
+        provider.setFullName(request.getFullName());
+        provider.setPhone(request.getPhone());
+        provider.setDescription(request.getDescription());
+        provider.setExperienceYears(
+                request.getExperienceYears()
+        );
 
-        if (request.getPhone() != null)
-            profile.setPhone(request.getPhone());
+        if (profileImage != null && !profileImage.isEmpty()) {
 
-        if (request.getProfileImage() != null)
-            profile.setProfileImage(request.getProfileImage());
+            String newImageUrl =
+                    cloudinaryService.uploadFile(profileImage);
 
-        if (request.getDescription() != null)
-            profile.setDescription(request.getDescription());
+            provider.setProfileImage(newImageUrl);
+        }
 
-        if (request.getExperienceYears() != null)
-            profile.setExperienceYears(request.getExperienceYears());
+        ProviderProfile updatedProvider =
+                providerProfileRepository.save(provider);
 
-        repository.save(profile);
-
-        return mapToResponse(profile);
+        return mapToResponse(updatedProvider);
     }
-
     @Override
-    public ProviderProfileResponse getProviderById(Long providerId) {
+    @Transactional(readOnly = true)
+    public ProviderProfileResponse getProviderById(
+            Long providerId) {
 
-        ProviderProfile profile = repository.findById(providerId)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        ProviderProfile provider =
+                providerProfileRepository
+                        .findById(providerId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Provider not found with id: "
+                                                + providerId
+                                )
+                        );
 
-        return mapToResponse(profile);
+        return mapToResponse(provider);
     }
 
-    private ProviderProfileResponse mapToResponse(ProviderProfile p) {
+    private ProviderProfile findByAuthUserId(
+            Long authUserId) {
+
+        return providerProfileRepository
+                .findByAuthUserId(authUserId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Provider profile not found"
+                        )
+                );
+    }
+
+    private ProviderProfileResponse mapToResponse(
+            ProviderProfile provider) {
 
         return ProviderProfileResponse.builder()
-                .id(p.getId())
-                .fullName(p.getFullName())
-                .phone(p.getPhone())
-                .profileImage(p.getProfileImage())
-                .description(p.getDescription())
-                .experienceYears(p.getExperienceYears())
-                .approvalStatus(p.getApprovalStatus())
-                .averageRating(p.getAverageRating())
-                .totalJobsCompleted(p.getTotalJobsCompleted())
+        		.providerId(provider.getId())
+                .authUserId(provider.getAuthUserId())
+                .fullName(provider.getFullName())
+                .phone(provider.getPhone())
+                .profileImage(provider.getProfileImage())
+                .description(provider.getDescription())
+                .experienceYears(
+                        provider.getExperienceYears()
+                )
+                .approvalStatus(
+                        provider.getApprovalStatus()
+                )
+                .averageRating(
+                        provider.getAverageRating()
+                )
+                .totalJobsCompleted(
+                        provider.getTotalJobsCompleted()
+                )
                 .build();
     }
 }

@@ -121,13 +121,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
 
+        ex.printStackTrace();
+
         Map<String, Object> error = new HashMap<>();
 
         error.put("timestamp", LocalDateTime.now());
         error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         error.put("error", HttpStatus.INTERNAL_SERVER_ERROR.name());
-        error.put("message", "An unexpected error occurred");
 
-        return ResponseEntity.internalServerError().body(error);
+        // Use the real message during development.
+        error.put(
+                "message",
+                ex.getMessage() != null
+                        ? ex.getMessage()
+                        : "An unexpected error occurred"
+        );
+
+        return ResponseEntity
+                .internalServerError()
+                .body(error);
     }
 }

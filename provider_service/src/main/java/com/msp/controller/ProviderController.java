@@ -5,8 +5,13 @@ import com.msp.dto.request.CreateProviderProfileRequest;
 import com.msp.dto.request.UpdateProviderProfileRequest;
 import com.msp.dto.response.ProviderProfileResponse;
 import com.msp.service.ProviderService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/providers")
@@ -15,15 +20,33 @@ public class ProviderController {
 
     private final ProviderService service;
 
-    @PostMapping("/profile/createProfile")
+    @PostMapping(
+            value = "/profile/createProfile",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ApiResponse<ProviderProfileResponse> createProfile(
             @RequestHeader("X-User-Id") Long authUserId,
-            @RequestBody CreateProviderProfileRequest request) {
+
+            @Valid
+            @RequestPart("profile")
+            CreateProviderProfileRequest request,
+
+            @RequestPart(
+                    value = "profileImage",
+                    required = false
+            )
+            MultipartFile profileImage) {
 
         return ApiResponse.<ProviderProfileResponse>builder()
                 .success(true)
                 .message("Profile created successfully")
-                .data(service.createProfile(authUserId, request))
+                .data(
+                        service.createProfile(
+                                authUserId,
+                                request,
+                                profileImage
+                        )
+                )
                 .build();
     }
 
@@ -33,19 +56,38 @@ public class ProviderController {
 
         return ApiResponse.<ProviderProfileResponse>builder()
                 .success(true)
+                .message("Profile fetched successfully")
                 .data(service.getMyProfile(authUserId))
                 .build();
     }
 
-    @PutMapping("/profile/updateProfile")
+    @PutMapping(
+            value = "/profile/updateProfile",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ApiResponse<ProviderProfileResponse> updateProfile(
             @RequestHeader("X-User-Id") Long authUserId,
-            @RequestBody UpdateProviderProfileRequest request) {
+
+            @Valid
+            @RequestPart("profile")
+            UpdateProviderProfileRequest request,
+
+            @RequestPart(
+                    value = "profileImage",
+                    required = false
+            )
+            MultipartFile profileImage) {
 
         return ApiResponse.<ProviderProfileResponse>builder()
                 .success(true)
                 .message("Profile updated successfully")
-                .data(service.updateProfile(authUserId, request))
+                .data(
+                        service.updateProfile(
+                                authUserId,
+                                request,
+                                profileImage
+                        )
+                )
                 .build();
     }
 
@@ -55,6 +97,7 @@ public class ProviderController {
 
         return ApiResponse.<ProviderProfileResponse>builder()
                 .success(true)
+                .message("Provider fetched successfully")
                 .data(service.getProviderById(providerId))
                 .build();
     }

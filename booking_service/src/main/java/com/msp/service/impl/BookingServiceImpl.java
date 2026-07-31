@@ -7,10 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.msp.dto.request.CancelBookingRequest;
 import com.msp.dto.request.CreateBookingRequest;
+import com.msp.dto.request.UpdatePaymentRequest;
 import com.msp.dto.response.BookingResponse;
 import com.msp.dto.response.ProviderBookingInfoResponse;
 import com.msp.entity.Booking;
 import com.msp.enums.BookingStatus;
+import com.msp.enums.PaymentStatus;
 import com.msp.exception.BadRequestException;
 import com.msp.exception.ResourceNotFoundException;
 import com.msp.feign.ProviderClient;
@@ -173,6 +175,7 @@ public class BookingServiceImpl implements BookingService {
                 .finalPrice(booking.getFinalPrice())
                 .status(booking.getStatus())
                 .paymentStatus(booking.getPaymentStatus())
+                .paymentMethod(booking.getPaymentMethod())
                 .cancellationReason(
                         booking.getCancellationReason()
                 )
@@ -183,5 +186,59 @@ public class BookingServiceImpl implements BookingService {
                 .createdAt(booking.getCreatedAt())
                 .updatedAt(booking.getUpdatedAt())
                 .build();
+    }
+    
+    @Override
+    @Transactional
+    public BookingResponse updatePaymentStatus(
+            Long bookingId,
+            Long customerId,
+            UpdatePaymentRequest request) {
+
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Booking not found with ID: "
+                                        + bookingId
+                        )
+                );
+
+        if (!booking.getCustomerId().equals(customerId)) {
+            throw new BadRequestException(
+                    "You are not allowed to pay for this booking"
+            );
+        }
+
+        if (booking.getStatus() != BookingStatus.COMPLETED) {
+            throw new BadRequestException(
+                    "Payment is allowed only after booking completion"
+            );
+        }
+
+        if (booking.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new BadRequestException(
+                    "Payment has already been completed"
+            );
+        }
+
+        if (request.getPaymentStatus() != PaymentStatus.PAID) {
+            throw new BadRequestException(
+                    "Payment status must be PAID"
+            );
+        }
+
+        booking.setPaymentStatus(
+                PaymentStatus.PAID
+        );
+
+        booking.setPaymentMethod(
+                request.getPaymentMethod()
+        );
+
+        Booking savedBooking =
+                bookingRepository.save(booking);
+
+        return mapToResponse(savedBooking);
     }
 }

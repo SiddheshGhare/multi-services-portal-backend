@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.msp.dto.request.CancelBookingRequest;
 import com.msp.dto.request.CreateBookingRequest;
+import com.msp.dto.request.UpdatePaymentRequest;
 import com.msp.dto.response.BookingResponse;
 
 public interface BookingService {
@@ -26,5 +27,11 @@ public interface BookingService {
             Long bookingId,
             Long customerId,
             CancelBookingRequest request
+    );
+
+    BookingResponse updatePaymentStatus(
+            Long bookingId,
+            Long customerId,
+            UpdatePaymentRequest request
     );
 }

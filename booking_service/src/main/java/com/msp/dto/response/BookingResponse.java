@@ -7,6 +7,7 @@ import java.time.LocalTime;
 
 import com.msp.enums.BookingStatus;
 import com.msp.enums.CancellationReason;
+import com.msp.enums.PaymentMethod;
 import com.msp.enums.PaymentStatus;
 
 import lombok.Builder;
@@ -47,6 +48,8 @@ public class BookingResponse {
     private BookingStatus status;
 
     private PaymentStatus paymentStatus;
+
+    private PaymentMethod paymentMethod;
 
     private CancellationReason cancellationReason;
 

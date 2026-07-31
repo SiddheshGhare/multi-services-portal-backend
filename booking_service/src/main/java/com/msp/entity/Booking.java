@@ -9,6 +9,7 @@ import java.util.UUID;
 import com.msp.enums.BookingStatus;
 import com.msp.enums.CancellationReason;
 import com.msp.enums.PaymentStatus;
+import com.msp.enums.PaymentMethod;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -100,6 +101,10 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cancellation_reason")

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.msp.dto.request.UpdatePaymentRequest;
 
 import com.msp.dto.request.CancelBookingRequest;
 import com.msp.dto.request.CreateBookingRequest;
@@ -59,6 +60,21 @@ public class BookingController {
                 bookingService.getBookingById(
                         bookingId,
                         customerId
+                )
+        );
+    }
+    
+    @PutMapping("/{bookingId}/payment")
+    public ResponseEntity<BookingResponse> updatePaymentStatus(
+            @PathVariable Long bookingId,
+            @RequestHeader("X-User-Id") Long customerId,
+            @Valid @RequestBody UpdatePaymentRequest request) {
+
+        return ResponseEntity.ok(
+                bookingService.updatePaymentStatus(
+                        bookingId,
+                        customerId,
+                        request
                 )
         );
     }
